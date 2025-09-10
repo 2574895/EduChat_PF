@@ -3,7 +3,6 @@ import MarkdownUI
 
 struct MessageBubble: View {
     let message: Message
-    @State private var isHovered = false
 
     // 마크다운 스타일링을 위한 포맷터 (AIResponseFormatter에서 처리됨)
     private var formattedContent: String {
@@ -16,16 +15,13 @@ struct MessageBubble: View {
                 Spacer()
                 if #available(macOS 12.0, *) {
                     Text(.init(message.content))
-                        .font(.system(size: 16))
+                        .font(.system(size: 17))
                         .padding(12)
-                        .background(Color.blue.opacity(isHovered ? 0.8 : 1.0))
+                        .background(Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(16)
                         .frame(maxWidth: 360, alignment: .trailing)
                         .textSelection(.enabled)
-                        .onHover { hovering in
-                            isHovered = hovering
-                        }
                         .contextMenu {
                             Button(action: {
                                 copyToClipboard(message.content)
@@ -36,16 +32,13 @@ struct MessageBubble: View {
                         }
                 } else {
                     Text(message.content)
-                        .font(.system(size: 16))
+                        .font(.system(size: 17))
                         .padding(12)
-                        .background(Color.blue.opacity(isHovered ? 0.8 : 1.0))
+                        .background(Color.blue)
                         .foregroundColor(.white)
                         .cornerRadius(16)
                         .frame(maxWidth: 360, alignment: .trailing)
                         .textSelection(.enabled)
-                        .onHover { hovering in
-                            isHovered = hovering
-                        }
                         .contextMenu {
                             Button(action: {
                                 copyToClipboard(message.content)
@@ -60,15 +53,13 @@ struct MessageBubble: View {
                 if #available(macOS 12.0, *) {
                     Markdown(formattedContent)
                         .markdownTheme(.gitHub)
+                        .font(.system(size: 17))
                         .padding(14)
-                        .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
+                        .background(Color.secondary.opacity(0.2))
                         .foregroundColor(.primary)
                         .cornerRadius(12)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .textSelection(.enabled)
-                        .onHover { hovering in
-                            isHovered = hovering
-                        }
                         .contextMenu {
                             Button(action: {
                                 NSPasteboard.general.clearContents()
@@ -91,15 +82,13 @@ struct MessageBubble: View {
                 } else {
                     // macOS 12.0 미만에서는 Text 사용 (하위 호환성)
                     Text(.init(formattedContent))
+                        .font(.system(size: 17))
                         .padding(14)
-                        .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
+                        .background(Color.secondary.opacity(0.2))
                         .foregroundColor(.primary)
                         .cornerRadius(12)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .textSelection(.enabled)
-                        .onHover { hovering in
-                            isHovered = hovering
-                        }
                         .contextMenu {
                             Button(action: {
                                 NSPasteboard.general.clearContents()
