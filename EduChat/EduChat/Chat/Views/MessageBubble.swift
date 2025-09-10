@@ -1,17 +1,10 @@
 import SwiftUI
-import MarkdownUI
 
 struct MessageBubble: View {
     let message: Message
     @State private var isHovered = false
 
-    // MarkdownUI 사용 시
-    private var markdownContent: String {
-        // AIResponseFormatter에서 변환된 마크다운 콘텐츠 사용
-        return message.content
-    }
-
-    // 기존 방식 (fallback)
+    // 마크다운 스타일링을 위한 포맷터 (AIResponseFormatter에서 처리됨)
     private var formattedContent: String {
         return message.content
     }
@@ -62,10 +55,9 @@ struct MessageBubble: View {
                         }
                 }
             } else {
-                // MarkdownUI 사용 - 더 깔끔하고 풍부한 마크다운 렌더링
+                // 기본 SwiftUI Text 사용 - 간단한 마크다운 스타일링
                 if #available(macOS 12.0, *) {
-                    Markdown(markdownContent)
-                        .markdownTheme(.gitHub) // 깔끔한 GitHub 스타일 테마
+                    Text(.init(formattedContent))
                         .padding(14)
                         .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
                         .foregroundColor(.primary)
@@ -78,7 +70,7 @@ struct MessageBubble: View {
                         .contextMenu {
                             Button(action: {
                                 NSPasteboard.general.clearContents()
-                                NSPasteboard.general.setString(markdownContent, forType: .string)
+                                NSPasteboard.general.setString(formattedContent, forType: .string)
                             }) {
                                 Text("복사")
                                 Image(systemName: "doc.on.doc")
@@ -87,7 +79,7 @@ struct MessageBubble: View {
                                 #if os(macOS)
                                 let pasteboard = NSPasteboard.general
                                 pasteboard.clearContents()
-                                pasteboard.setString(markdownContent, forType: .string)
+                                pasteboard.setString(formattedContent, forType: .string)
                                 #endif
                             }) {
                                 Text("전체 선택 후 복사")

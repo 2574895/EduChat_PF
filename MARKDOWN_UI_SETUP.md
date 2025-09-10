@@ -6,6 +6,39 @@ SwiftUI에서 마크다운을 아름답게 렌더링하는 라이브러리
 - SwiftUI 네이티브 지원
 - 풍부한 마크다운 기능 지원
 
+## 🚨 긴급 문제 해결: cmark_gfm 모듈 에러
+
+### 문제 상황:
+```
+Command SwiftCompile failed with a nonzero exit code
+No such module 'cmark_gfm'
+```
+
+### ⚠️ 수동 설치 방식의 한계:
+- ❌ cmark_gfm C 라이브러리 누락
+- ❌ NetworkImage 의존성 문제
+- ❌ 복잡한 수동 관리 필요
+
+### ✅ 권장 해결 방법:
+**Swift Package Manager를 사용하세요!**
+
+#### 1단계: 기존 파일들 제거
+```bash
+cd /Users/test/renew_project/EduChat
+rm -rf EduChat/EduChat/Services/MarkdownUI
+```
+
+#### 2단계: Swift Package Manager로 설치
+```bash
+# Xcode에서:
+# File → Add Packages...
+# URL: https://github.com/gonzalezreal/swift-markdown-ui
+# Version: Up to Next Major (2.0.0+)
+# Add to Target: EduChat
+```
+
+---
+
 ## 📋 방법 1: Swift Package Manager (권장) ⭐
 
 ### 1단계: Xcode 열기
