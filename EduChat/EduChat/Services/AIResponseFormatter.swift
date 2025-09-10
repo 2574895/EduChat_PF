@@ -29,8 +29,53 @@ final class AIResponseFormatter {
 
     /// 딥러닝 모드 응답 포맷팅
     private func formatDeepLearningMode(_ response: String) -> String {
-        let patterns = DeepLearningModePattern.allCases
-        return applyPatterns(response, patterns: patterns)
+        var formatted = response
+
+        // 1단계: 정확한 패턴 매칭 시도
+        let exactPatterns = DeepLearningModePattern.allCases
+        formatted = applyPatterns(formatted, patterns: exactPatterns)
+
+        // 2단계: 유연한 패턴 매칭 (AI 응답이 약간 다를 경우 대비)
+        formatted = applyFlexiblePatterns(formatted)
+
+        return formatted
+    }
+
+    /// 유연한 패턴 매칭 (키워드 기반)
+    private func applyFlexiblePatterns(_ response: String) -> String {
+        var formatted = response
+
+        // 키워드 기반 유연한 매칭
+        let flexibleMappings: [(keywords: [String], header: String)] = [
+            (["핵심", "본질", "개념"], "## 1. 개념의 핵심 본질 파악"),
+            (["표면", "관계", "연결", "분석"], "## 2. 표면과 관계성 분석"),
+            (["원리", "구현", "방법", "기술"], "## 3. 원리와 구현 방법"),
+            (["응용", "활용", "분야", "적용"], "## 4. 응용과 활용 분야"),
+            (["역사", "발전", "맥락", "진화"], "## 5. 역사적 발전과 맥락"),
+            (["한계", "제약", "미래", "전망"], "## 6. 한계와 미래 전망")
+        ]
+
+        for (keywords, header) in flexibleMappings {
+            // 이미 헤더가 있는지 확인
+            if !formatted.contains(header) {
+                // 키워드 중 하나라도 포함되어 있는지 확인
+                for keyword in keywords {
+                    if formatted.contains(keyword) {
+                        // 해당 키워드가 포함된 위치 찾기
+                        if let range = formatted.range(of: keyword) {
+                            // 키워드 앞에 헤더 추가
+                            let prefix = String(formatted[..<range.lowerBound])
+                            let suffix = String(formatted[range.lowerBound...])
+
+                            formatted = prefix + "\n\n" + header + "\n\n" + suffix
+                            break
+                        }
+                    }
+                }
+            }
+        }
+
+        return formatted
     }
 
     /// 패턴들을 적용하여 응답을 변환
@@ -50,6 +95,11 @@ final class AIResponseFormatter {
     /// 최종 포맷팅 정리 (빈 줄 정리, 공백 제거 등)
     private func finalizeFormatting(_ text: String) -> String {
         var formatted = text
+
+        // 이상한 구분선 제거 (--------- 같은 것들)
+        formatted = formatted.replacingOccurrences(of: "-{3,}", with: "", options: .regularExpression)
+        formatted = formatted.replacingOccurrences(of: "_{3,}", with: "", options: .regularExpression)
+        formatted = formatted.replacingOccurrences(of: "={3,}", with: "", options: .regularExpression)
 
         // 과도한 빈 줄 정리
         formatted = formatted.replacingOccurrences(of: "\n\n\n\n", with: "\n\n\n")
