@@ -1,5 +1,5 @@
 import SwiftUI
-// import MarkdownUI // Swift Package Manager에서 추가 필요
+import MarkdownUI
 
 struct MessageBubble: View {
     let message: Message
@@ -62,10 +62,10 @@ struct MessageBubble: View {
                         }
                 }
             } else {
-                // MarkdownUI 사용 (라이브러리가 추가되면 활성화)
-                /*
+                // MarkdownUI 사용 - 더 깔끔하고 풍부한 마크다운 렌더링
                 if #available(macOS 12.0, *) {
                     Markdown(markdownContent)
+                        .markdownTheme(.gitHub) // 깔끔한 GitHub 스타일 테마
                         .padding(14)
                         .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
                         .foregroundColor(.primary)
@@ -83,37 +83,11 @@ struct MessageBubble: View {
                                 Text("복사")
                                 Image(systemName: "doc.on.doc")
                             }
-                        }
-                } else {
-                    // MarkdownUI를 사용할 수 없는 경우 기존 방식으로 fallback
-                }
-                */
-
-                // 현재 방식 (MarkdownUI 추가 전까지 사용)
-                if #available(macOS 12.0, *) {
-                    Text(.init(formattedContent))
-                        .padding(14)
-                        .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
-                        .foregroundColor(.primary)
-                        .cornerRadius(12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
-                        .onHover { hovering in
-                            isHovered = hovering
-                        }
-                        .contextMenu {
-                            Button(action: {
-                                NSPasteboard.general.clearContents()
-                                NSPasteboard.general.setString(formattedContent, forType: .string)
-                            }) {
-                                Text("복사")
-                                Image(systemName: "doc.on.doc")
-                            }
                             Button(action: {
                                 #if os(macOS)
                                 let pasteboard = NSPasteboard.general
                                 pasteboard.clearContents()
-                                pasteboard.setString(formattedContent, forType: .string)
+                                pasteboard.setString(markdownContent, forType: .string)
                                 #endif
                             }) {
                                 Text("전체 선택 후 복사")
@@ -121,7 +95,8 @@ struct MessageBubble: View {
                             }
                         }
                 } else {
-                    Text(formattedContent)
+                    // macOS 12.0 미만에서는 기존 방식 사용 (하위 호환성)
+                    Text(.init(formattedContent))
                         .padding(14)
                         .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
                         .foregroundColor(.primary)

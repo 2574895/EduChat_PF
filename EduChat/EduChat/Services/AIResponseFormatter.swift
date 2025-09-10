@@ -45,14 +45,14 @@ final class AIResponseFormatter {
     private func applyFlexiblePatterns(_ response: String) -> String {
         var formatted = response
 
-        // 키워드 기반 유연한 매칭
+        // 키워드 기반 유연한 매칭 - MarkdownUI용 이모지 추가
         let flexibleMappings: [(keywords: [String], header: String)] = [
-            (["핵심", "본질", "개념"], "## 1. 개념의 핵심 본질 파악"),
-            (["표면", "관계", "연결", "분석"], "## 2. 표면과 관계성 분석"),
-            (["원리", "구현", "방법", "기술"], "## 3. 원리와 구현 방법"),
-            (["응용", "활용", "분야", "적용"], "## 4. 응용과 활용 분야"),
-            (["역사", "발전", "맥락", "진화"], "## 5. 역사적 발전과 맥락"),
-            (["한계", "제약", "미래", "전망"], "## 6. 한계와 미래 전망")
+            (["핵심", "본질", "개념"], "## 1. 🧠 개념의 핵심 본질 파악"),
+            (["표면", "관계", "연결", "분석"], "## 2. 🔍 표면과 관계성 분석"),
+            (["원리", "구현", "방법", "기술"], "## 3. ⚙️ 원리와 구현 방법"),
+            (["응용", "활용", "분야", "적용"], "## 4. 🌐 응용과 활용 분야"),
+            (["역사", "발전", "맥락", "진화"], "## 5. 📚 역사적 발전과 맥락"),
+            (["한계", "제약", "미래", "전망"], "## 6. ⚖️ 한계와 미래 전망")
         ]
 
         for (keywords, header) in flexibleMappings {
@@ -92,20 +92,22 @@ final class AIResponseFormatter {
         return finalizeFormatting(formatted)
     }
 
-    /// 최종 포맷팅 정리 (빈 줄 정리, 공백 제거 등)
+    /// 최종 포맷팅 정리 (빈 줄 정리, 공백 제거 등) - MarkdownUI 최적화
     private func finalizeFormatting(_ text: String) -> String {
         var formatted = text
 
-        // 이상한 구분선 제거 (--------- 같은 것들)
+        // 이상한 구분선 제거 (--------- 같은 것들) - MarkdownUI 파싱 오류 방지
         formatted = formatted.replacingOccurrences(of: "-{3,}", with: "", options: .regularExpression)
         formatted = formatted.replacingOccurrences(of: "_{3,}", with: "", options: .regularExpression)
         formatted = formatted.replacingOccurrences(of: "={3,}", with: "", options: .regularExpression)
 
-        // AI가 추가한 빈 줄 2줄(\n\n)을 마크다운 빈 줄 2줄로 유지
-        // (AI가 시스템 프롬프트대로 빈 줄 2줄을 추가했으므로 이를 존중)
-
-        // 과도한 빈 줄(4줄 이상)만 정리
+        // AI가 추가한 빈 줄 2줄(\n\n)을 존중하되 과도한 빈 줄 정리
         formatted = formatted.replacingOccurrences(of: "\n\n\n\n\n", with: "\n\n\n")
+
+        // MarkdownUI를 위한 최적화
+        // 각 헤더 앞에 빈 줄 추가 (파싱 향상)
+        formatted = formatted.replacingOccurrences(of: "## ", with: "\n## ", options: .regularExpression)
+        formatted = formatted.replacingOccurrences(of: "### ", with: "\n### ", options: .regularExpression)
 
         // 시작과 끝의 공백/줄바꿈 정리
         formatted = formatted.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -142,8 +144,8 @@ enum NormalModePattern: CaseIterable, ResponsePattern {
 
     var replacement: String {
         switch self {
-        case .summary: return "\n\n### 비유를 통한 핵심 요약\n\n"
-        case .history: return "\n\n### 개념의 역사\n\n"
+        case .summary: return "\n\n### 📌 비유를 통한 핵심 요약\n\n"
+        case .history: return "\n\n### 📚 개념의 역사\n\n"
         }
     }
 }
@@ -170,12 +172,12 @@ enum DeepLearningModePattern: CaseIterable, ResponsePattern {
 
     var replacement: String {
         switch self {
-        case .concept: return "\n\n## 1. 개념의 핵심 본질 파악\n\n"
-        case .analysis: return "\n\n## 2. 표면과 관계성 분석\n\n"
-        case .principle: return "\n\n## 3. 원리와 구현 방법\n\n"
-        case .application: return "\n\n## 4. 응용과 활용 분야\n\n"
-        case .history: return "\n\n## 5. 역사적 발전과 맥락\n\n"
-        case .limitation: return "\n\n## 6. 한계와 미래 전망\n\n"
+        case .concept: return "\n\n## 1. 🧠 개념의 핵심 본질 파악\n\n"
+        case .analysis: return "\n\n## 2. 🔍 표면과 관계성 분석\n\n"
+        case .principle: return "\n\n## 3. ⚙️ 원리와 구현 방법\n\n"
+        case .application: return "\n\n## 4. 🌐 응용과 활용 분야\n\n"
+        case .history: return "\n\n## 5. 📚 역사적 발전과 맥락\n\n"
+        case .limitation: return "\n\n## 6. ⚖️ 한계와 미래 전망\n\n"
         }
     }
 }
