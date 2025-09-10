@@ -1,5 +1,4 @@
 import SwiftUI
-import MarkdownUI
 
 struct MessageBubble: View {
     let message: Message
@@ -49,66 +48,24 @@ struct MessageBubble: View {
                         }
                 }
             } else {
-                // 로컬 패키지 사용 - 풍부한 마크다운 렌더링
-                if #available(macOS 12.0, *) {
-                    Markdown(formattedContent)
-                        .markdownTheme(.gitHub)
-                        .font(.system(size: 17))
-                        .padding(14)
-                        .background(Color.secondary.opacity(0.2))
-                        .foregroundColor(.primary)
-                        .cornerRadius(12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
-                        .contextMenu {
-                            Button(action: {
-                                NSPasteboard.general.clearContents()
-                                NSPasteboard.general.setString(formattedContent, forType: .string)
-                            }) {
-                                Text("복사")
-                                Image(systemName: "doc.on.doc")
-                            }
-                            Button(action: {
-                                #if os(macOS)
-                                let pasteboard = NSPasteboard.general
-                                pasteboard.clearContents()
-                                pasteboard.setString(formattedContent, forType: .string)
-                                #endif
-                            }) {
-                                Text("전체 선택 후 복사")
-                                Image(systemName: "checkmark.circle")
-                            }
+                // 간단한 텍스트 렌더링으로 변경 (마크다운 대신)
+                Text(message.content)
+                    .font(.system(size: 17))
+                    .padding(14)
+                    .background(Color.secondary.opacity(0.2))
+                    .foregroundColor(.primary)
+                    .cornerRadius(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .textSelection(.enabled)
+                    .lineSpacing(4) // 적절한 줄 간격 추가
+                    .contextMenu {
+                        Button(action: {
+                            copyToClipboard(message.content)
+                        }) {
+                            Text("복사")
+                            Image(systemName: "doc.on.doc")
                         }
-                } else {
-                    // macOS 12.0 미만에서는 Text 사용 (하위 호환성)
-                    Text(.init(formattedContent))
-                        .font(.system(size: 17))
-                        .padding(14)
-                        .background(Color.secondary.opacity(0.2))
-                        .foregroundColor(.primary)
-                        .cornerRadius(12)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .textSelection(.enabled)
-                        .contextMenu {
-                            Button(action: {
-                                NSPasteboard.general.clearContents()
-                                NSPasteboard.general.setString(formattedContent, forType: .string)
-                            }) {
-                                Text("복사")
-                                Image(systemName: "doc.on.doc")
-                            }
-                            Button(action: {
-                                #if os(macOS)
-                                let pasteboard = NSPasteboard.general
-                                pasteboard.clearContents()
-                                pasteboard.setString(formattedContent, forType: .string)
-                                #endif
-                            }) {
-                                Text("전체 선택 후 복사")
-                                Image(systemName: "checkmark.circle")
-                            }
-                        }
-                }
+                    }
                 Spacer()
             }
         }
