@@ -1,5 +1,5 @@
 import SwiftUI
-import MarkdownUI
+// import MarkdownUI // TODO: Swift Package Manager에서 추가 필요
 
 struct MessageBubble: View {
     let message: Message
@@ -62,6 +62,9 @@ struct MessageBubble: View {
                         }
                 }
             } else {
+                // 현재 방식 (MarkdownUI 추가 전까지 사용)
+                // TODO: MarkdownUI 추가 후 활성화
+                /*
                 // MarkdownUI 사용 - 더 깔끔하고 풍부한 마크다운 렌더링
                 if #available(macOS 12.0, *) {
                     Markdown(markdownContent)
@@ -88,6 +91,40 @@ struct MessageBubble: View {
                                 let pasteboard = NSPasteboard.general
                                 pasteboard.clearContents()
                                 pasteboard.setString(markdownContent, forType: .string)
+                                #endif
+                            }) {
+                                Text("전체 선택 후 복사")
+                                Image(systemName: "checkmark.circle")
+                            }
+                        }
+                } else {
+                */
+
+                // 현재 방식 (MarkdownUI 추가 전까지 사용)
+                if #available(macOS 12.0, *) {
+                    Text(.init(formattedContent))
+                        .padding(14)
+                        .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
+                        .foregroundColor(.primary)
+                        .cornerRadius(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
+                        .onHover { hovering in
+                            isHovered = hovering
+                        }
+                        .contextMenu {
+                            Button(action: {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(formattedContent, forType: .string)
+                            }) {
+                                Text("복사")
+                                Image(systemName: "doc.on.doc")
+                            }
+                            Button(action: {
+                                #if os(macOS)
+                                let pasteboard = NSPasteboard.general
+                                pasteboard.clearContents()
+                                pasteboard.setString(formattedContent, forType: .string)
                                 #endif
                             }) {
                                 Text("전체 선택 후 복사")

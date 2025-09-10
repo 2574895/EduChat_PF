@@ -34,15 +34,43 @@ https://github.com/gonzalezreal/swift-markdown-ui
 
 ### MessageBubble.swift에서 주석 해제
 ```swift
-// 1. import 추가
-import MarkdownUI
+// 1. import 추가 (라인 2)
+import MarkdownUI  // 주석 제거
 
-// 2. MarkdownUI 사용 부분 주석 해제
+// 2. MarkdownUI 사용 부분 주석 해제 (라인 68-100)
+// 현재 주석 처리된 Markdown 컴포넌트 부분을 활성화하세요
 if #available(macOS 12.0, *) {
     Markdown(markdownContent)
+        .markdownTheme(.gitHub) // 깔끔한 GitHub 스타일
         .padding(14)
+        .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
         // ... 나머지 스타일
 }
+```
+
+## 🚨 긴급 문제 해결 (현재 에러 발생 시)
+
+### "No such module 'MarkdownUI'" 에러 해결
+```bash
+# 1. Xcode 완전히 닫기
+# 2. 터미널에서 프로젝트 열기
+open EduChat.xcodeproj
+
+# 3. DerivedData 삭제 (캐시 문제 해결)
+rm -rf ~/Library/Developer/Xcode/DerivedData
+
+# 4. Clean Build
+# Xcode 메뉴: Product → Clean Build Folder (⌘+Shift+K)
+
+# 5. 다시 빌드
+# Xcode 메뉴: Product → Build (⌘+B)
+```
+
+### 4단계: 패키지 재추가 확인
+```
+Xcode Navigator (왼쪽) → EduChat → Dependencies
+- MarkdownUI가 목록에 있는지 확인
+- 없으면 다시 Add Packages... 진행
 ```
 
 ## 🎨 MarkdownUI 장점
