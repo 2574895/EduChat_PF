@@ -3,6 +3,8 @@ import SwiftUI
 
 @MainActor
 final class ChatManager: ObservableObject {
+    // 하드코딩된 응답들을 위한 유틸리티
+    private let utils = ChatUtils()
     @Published var sessions: [ChatSession] = []
     @Published var currentSessionId: UUID?
     @Published var isLoading = false
@@ -182,7 +184,42 @@ final class ChatManager: ObservableObject {
             return
         }
 
-        // 딥러닝 모드에서 사전 질문 플로우 처리
+        // 하드코딩된 주제 확인 (사전질문 플로우 제어)
+        if let hardcodedTopic = utils.getHardcodedTopic(for: text) {
+            print("🎯 하드코딩된 주제 발견: \(hardcodedTopic) - 바로 기본 응답 표시")
+            // 하드코딩된 주제라면 바로 기본 응답 표시
+            if let response = utils.getHardcodedResponse(for: hardcodedTopic, isDeepMode: fullStudyMode) {
+                let userMessage = Message(content: text, isFromUser: true)
+                let responseMessage = Message(content: response, isFromUser: false)
+
+                session.addMessage(userMessage)
+                session.addMessage(responseMessage)
+
+                // 첫 번째 메시지일 때 제목 업데이트
+                if session.messages.filter({ $0.isFromUser }).count == 1 {
+                    session.updateTitleFromFirstMessage()
+                }
+
+                // 세션 업데이트
+                if let index = sessions.firstIndex(where: { $0.id == session.id }) {
+                    sessions[index] = session
+                    saveSessions()
+                }
+
+                print("✅ 하드코딩된 주제 직접 응답 완료")
+            } else {
+                // 응답을 찾을 수 없는 경우 일반 LLM 호출
+                print("⚠️ 하드코딩된 응답을 찾을 수 없음, 일반 LLM 호출로 전환")
+                if fullStudyMode {
+                    startPreliminaryQuestions(text, session: &session)
+                } else {
+                    processNormalMode(text, session: session)
+                }
+            }
+            return
+        }
+
+        // 딥러닝 모드에서 사전 질문 플로우 처리 (하드코딩되지 않은 주제만)
         if fullStudyMode {
             if isWaitingForPreliminaryQuestions {
                 // 사전 질문에 답변하는 경우
@@ -222,13 +259,8 @@ final class ChatManager: ObservableObject {
         isWaitingForPreliminaryQuestions = true
         preliminaryQuestionStep = 0
 
-        // 첫 번째 사전 질문 메시지 추가
-        let questionMessage = Message(content: """
-        📚 **딥러닝 모드: 사전 질문**
-
-        1. 이 개념을 어떻게 심층적으로 분석하고 설명할지 계획을 말씀해주세요.
-        (예: 단계별로 접근, 특정 측면 위주로, 실무 적용 중심 등)
-        """, isFromUser: false)
+        // 하드코딩된 주제 선택 질문 메시지 추가
+        let questionMessage = Message(content: utils.createTopicSelectionQuestion(), isFromUser: false)
 
         session.addMessage(questionMessage)
 
@@ -240,47 +272,29 @@ final class ChatManager: ObservableObject {
     }
 
     private func processPreliminaryQuestionResponse(_ text: String, session: inout ChatSession) {
-        if preliminaryQuestionStep == 0 {
-            // 두 번째 사전 질문 메시지 추가
-            let secondQuestionMessage = Message(content: """
-            📚 **딥러닝 모드: 사전 질문 (2/2)**
+        // 사전 질문 상태 초기화
+        isWaitingForPreliminaryQuestions = false
+        preliminaryQuestionStep = 0
 
-            2. 최종 응답을 어떤 방식으로 구성하고 싶으신가요?
-            (예: 구조화된 분석, 실무 중심, 학문적 접근 등)
-            """, isFromUser: false)
+        // 선택된 주제가 하드코딩된 것인지 확인
+        if let selectedTopic = utils.getHardcodedTopic(for: text) {
+            // 하드코딩된 주제라면 직접 응답
+            if let response = utils.getHardcodedResponse(for: selectedTopic, isDeepMode: true) {
+                let responseMessage = Message(content: response, isFromUser: false)
+                session.addMessage(responseMessage)
 
-            session.addMessage(secondQuestionMessage)
-            preliminaryQuestionStep = 1
-
-        } else if preliminaryQuestionStep == 1 {
-            // 사전 질문 상태 초기화
-            isWaitingForPreliminaryQuestions = false
-            preliminaryQuestionStep = 0
-
-            // 최종 질문 조합 - 세션에서 사용자의 원래 질문을 찾기
-            let userMessages = session.messages.filter { $0.isFromUser }
-            let originalQuestion = userMessages.first?.content ?? ""
-            let analysisPlan = userMessages.count >= 3 ? userMessages[userMessages.count - 3].content : userMessages.first?.content ?? ""
-            let responseStyle = userMessages.last?.content ?? text
-
-            let finalQuestion = """
-            사용자가 다음과 같이 질문했습니다:
-
-            [원래 질문]: \(originalQuestion)
-
-            사전 질문 답변:
-            [분석 계획]: \(analysisPlan)
-            [응답 구성 방식]: \(responseStyle)
-
-            위 내용을 바탕으로 심층적이고 체계적인 설명을 제공해주세요.
-            사용자가 제시한 분석 계획("\(analysisPlan)")과 응답 구성 방식("\(responseStyle)")을 고려하여
-            개념을 심층적으로 분석하고 설명해주세요.
-
-            시스템 프롬프트에서 지정한 6단계 구조 형식을 정확히 따르세요.
-            """
-
-            // AI에게 최종 질문 전송
-            processFinalQuestion(finalQuestion, session: session)
+                print("✅ 하드코딩된 딥러닝 주제 응답 완료: \(selectedTopic)")
+            } else {
+                // 응답을 찾을 수 없는 경우 LLM 호출
+                print("⚠️ 하드코딩된 응답을 찾을 수 없음, LLM 호출로 전환")
+                let llmPrompt = "\(text)에 대해 심층적으로 분석해주세요."
+                processFinalQuestion(llmPrompt, session: session)
+            }
+        } else {
+            // 하드코딩되지 않은 주제라면 LLM 호출
+            print("📝 하드코딩되지 않은 주제, LLM 호출: \(text)")
+            let llmPrompt = "\(text)에 대해 심층적으로 분석해주세요."
+            processFinalQuestion(llmPrompt, session: session)
         }
 
         // 세션 업데이트
