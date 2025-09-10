@@ -30,33 +30,45 @@ final class ChatManager: ObservableObject {
     private let openAIService = OpenAIService()
     private let sessionsKey = "chat_sessions"
 
-    // LLM 응답 캐싱을 위한 메모리 캐시
-    private var responseCache = [String: String]()
-    private let maxCacheSize = 20 // 최대 캐시 개수
+    // 마크다운 변환을 위한 함수들
+    private func convertToMarkdown(_ response: String, isStudyMode: Bool) -> String {
+        var formatted = response
 
-    // 캐시 키 생성
-    private func cacheKey(for prompt: String, isStudyMode: Bool) -> String {
-        return "\(isStudyMode ? "study" : "normal")_\(prompt.hashValue)"
-    }
+        if isStudyMode {
+            // 딥러닝 모드 마크다운 변환
+            let deepLearningPatterns = [
+                ("개념의 핵심 본질 파악", "**1. 🧠 개념의 핵심 본질 파악**\n"),
+                ("표면과 관계성 분석", "\n\n**2. 🔍 표면과 관계성 분석**\n"),
+                ("원리와 구현 방법", "\n\n**3. ⚙️ 원리와 구현 방법**\n"),
+                ("응용과 활용 분야", "\n\n**4. 🌐 응용과 활용 분야**\n"),
+                ("역사적 발전과 맥락", "\n\n**5. 📚 역사적 발전과 맥락**\n"),
+                ("한계와 미래 전망", "\n\n**6. ⚖️ 한계와 미래 전망**\n")
+            ]
 
-    // 캐시에서 응답 가져오기
-    private func getCachedResponse(for prompt: String, isStudyMode: Bool) -> String? {
-        let key = cacheKey(for: prompt, isStudyMode: isStudyMode)
-        return responseCache[key]
-    }
+            for (pattern, replacement) in deepLearningPatterns {
+                if formatted.contains(pattern) {
+                    formatted = formatted.replacingOccurrences(of: pattern, with: replacement)
+                }
+            }
+        } else {
+            // 일반 모드 마크다운 변환
+            let normalPatterns = [
+                ("비유를 통한 핵심 요약", "**📌 비유를 통한 핵심 요약**\n"),
+                ("개념의 역사", "\n\n**📚 개념의 역사**\n")
+            ]
 
-    // 캐시에 응답 저장
-    private func cacheResponse(_ response: String, for prompt: String, isStudyMode: Bool) {
-        let key = cacheKey(for: prompt, isStudyMode: isStudyMode)
-        responseCache[key] = response
-
-        // 캐시 크기 제한
-        if responseCache.count > maxCacheSize {
-            // 가장 오래된 항목 제거 (간단한 구현)
-            if let firstKey = responseCache.keys.first {
-                responseCache.removeValue(forKey: firstKey)
+            for (pattern, replacement) in normalPatterns {
+                if formatted.contains(pattern) {
+                    formatted = formatted.replacingOccurrences(of: pattern, with: replacement)
+                }
             }
         }
+
+        // 추가 포맷팅 정리
+        formatted = formatted.replacingOccurrences(of: "\n\n\n", with: "\n\n")
+        formatted = formatted.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return formatted
     }
 
     var currentSession: ChatSession? {
@@ -339,21 +351,15 @@ final class ChatManager: ObservableObject {
                 isLoading = true
                 errorMessage = nil
 
-                var resp: String
+                // LLM 응답을 받고 반드시 마크다운으로 변환
+                let rawResponse = try await openAIService.generateReply(prompt: text, isStudyMode: fullStudyMode)
+                print("🤖 LLM 원본 응답 수신: \(rawResponse.prefix(100))...")
 
-                // 1. 캐시에서 응답 확인
-                if let cachedResponse = getCachedResponse(for: text, isStudyMode: fullStudyMode) {
-                    resp = cachedResponse
-                    print("📋 캐시된 LLM 응답 사용: \(resp.prefix(100))...")
-                } else {
-                    // 2. 캐시에 없으면 API 호출
-                    resp = try await openAIService.generateReply(prompt: text, isStudyMode: fullStudyMode)
-                    // 3. 응답 캐싱
-                    cacheResponse(resp, for: text, isStudyMode: fullStudyMode)
-                    print("🤖 새로운 LLM 응답 수신 및 캐싱: \(resp.prefix(100))...")
-                }
+                // 반드시 마크다운으로 변환하여 저장
+                let markdownResponse = convertToMarkdown(rawResponse, isStudyMode: fullStudyMode)
+                print("📝 마크다운 변환 완료: \(markdownResponse.prefix(100))...")
 
-                let assistant = Message(content: resp, isFromUser: false)
+                let assistant = Message(content: markdownResponse, isFromUser: false)
 
                 // 현재 세션에 AI 응답 추가
                 guard let currentSessionId = currentSessionId,
@@ -390,19 +396,15 @@ final class ChatManager: ObservableObject {
                 isLoading = true
                 errorMessage = nil
 
-                var resp: String
+                // 딥러닝 모드 최종 질문 LLM 응답을 받고 반드시 마크다운으로 변환
+                let rawResponse = try await openAIService.generateReply(prompt: finalQuestion, isStudyMode: true)
+                print("🎯 최종 LLM 원본 응답 수신: \(rawResponse.prefix(100))...")
 
-                // 캐시에서 응답 확인 (딥러닝 모드 최종 질문용)
-                if let cachedResponse = getCachedResponse(for: finalQuestion, isStudyMode: true) {
-                    resp = cachedResponse
-                    print("📋 캐시된 최종 LLM 응답 사용: \(resp.prefix(100))...")
-                } else {
-                    resp = try await openAIService.generateReply(prompt: finalQuestion, isStudyMode: true)
-                    cacheResponse(resp, for: finalQuestion, isStudyMode: true)
-                    print("🎯 새로운 최종 LLM 응답 수신 및 캐싱: \(resp.prefix(100))...")
-                }
+                // 반드시 마크다운으로 변환하여 저장 (딥러닝 모드)
+                let markdownResponse = convertToMarkdown(rawResponse, isStudyMode: true)
+                print("📝 최종 마크다운 변환 완료: \(markdownResponse.prefix(100))...")
 
-                let assistant = Message(content: resp, isFromUser: false)
+                let assistant = Message(content: markdownResponse, isFromUser: false)
 
                 // 현재 세션에 AI 응답 추가
                 guard let currentSessionId = currentSessionId,

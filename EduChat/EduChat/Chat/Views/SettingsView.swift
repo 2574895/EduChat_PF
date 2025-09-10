@@ -33,6 +33,7 @@ struct SettingsView: View {
             }
             .padding()
 
+
             HStack(spacing: 20) {
                 Button("취소") {
                     presentationMode.wrappedValue.dismiss()
