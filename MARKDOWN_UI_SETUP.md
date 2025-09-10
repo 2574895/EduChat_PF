@@ -82,20 +82,11 @@ EduChat/EduChat/Services/MarkdownUI/
 
 ## 🔧 코드 활성화
 
-### MessageBubble.swift에서 주석 해제
+### MessageBubble.swift에서 코드 활성화
 ```swift
-// 1. import 추가 (라인 2)
-import MarkdownUI  // 주석 제거
-
-// 2. MarkdownUI 사용 부분 주석 해제 (라인 68-100)
-// 현재 주석 처리된 Markdown 컴포넌트 부분을 활성화하세요
-if #available(macOS 12.0, *) {
-    Markdown(markdownContent)
-        .markdownTheme(.gitHub) // 깔끔한 GitHub 스타일
-        .padding(14)
-        .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
-        // ... 나머지 스타일
-}
+// 현재 상태: 이미 활성화됨 ✅
+// import MarkdownUI (라인 2)
+// Markdown() 컴포넌트 사용 중 (라인 67)
 ```
 
 ## 🚨 긴급 문제 해결 (현재 에러 발생 시)
@@ -171,3 +162,66 @@ Xcode Navigator (왼쪽) → EduChat → Dependencies
 ## 🎯 결론
 
 **MarkdownUI는 EduChat의 마크다운 렌더링을 한 단계 업그레이드할 것입니다!** 🚀✨
+
+---
+
+## 🔗 GitHub 연결 가이드 (선택사항)
+
+### 로컬 Git → GitHub 연결하기
+
+#### 1단계: GitHub에서 새 리포지토리 생성
+```
+GitHub.com → New repository
+- Repository name: EduChat
+- Description: AI 교육용 마크다운 채팅 앱
+- Public/Private: 선택
+- Add README: ❌ (이미 있음)
+- Add .gitignore: ❌ (이미 있음)
+- License: MIT
+```
+
+#### 2단계: 로컬 Git에 GitHub 연결
+```bash
+# GitHub URL을 자신의 리포지토리 URL로 변경
+git remote add origin https://github.com/YOUR_USERNAME/EduChat.git
+
+# 연결 확인
+git remote -v
+
+# 초기 푸시
+git push -u origin master
+```
+
+#### 3단계: 이후 커밋 푸시
+```bash
+# 변경사항 커밋 후
+git push  # origin master로 자동 푸시
+```
+
+### ⚠️ 참고사항
+- **GitHub 연결은 선택사항**입니다
+- 로컬에서만 작업한다면 GitHub 연결 불필요
+- **민감한 정보**는 `.gitignore`에 추가해서 커밋하지 마세요
+
+---
+
+## 📊 최종 프로젝트 구조
+
+```
+EduChat/
+├── EduChat.xcodeproj/          # Xcode 프로젝트
+├── EduChat/
+│   ├── EduChat/
+│   │   ├── Services/
+│   │   │   ├── MarkdownUI/     # 마크다운 렌더링 ✅
+│   │   │   ├── OpenAIService.swift
+│   │   │   ├── AIResponseFormatter.swift
+│   │   │   └── Constants.swift
+│   │   └── Chat/Views/
+│   │       └── MessageBubble.swift # MarkdownUI 사용 ✅
+│   └── EduChatApp.swift
+├── docs/                       # 문서
+├── MARKDOWN_UI_SETUP.md        # 이 파일
+├── README.md                   # 프로젝트 설명
+└── .gitignore                  # Git 무시 파일
+```
