@@ -101,8 +101,11 @@ final class AIResponseFormatter {
         formatted = formatted.replacingOccurrences(of: "_{3,}", with: "", options: .regularExpression)
         formatted = formatted.replacingOccurrences(of: "={3,}", with: "", options: .regularExpression)
 
-        // 과도한 빈 줄 정리
-        formatted = formatted.replacingOccurrences(of: "\n\n\n\n", with: "\n\n\n")
+        // AI가 추가한 빈 줄 2줄(\n\n)을 마크다운 빈 줄 2줄로 유지
+        // (AI가 시스템 프롬프트대로 빈 줄 2줄을 추가했으므로 이를 존중)
+
+        // 과도한 빈 줄(4줄 이상)만 정리
+        formatted = formatted.replacingOccurrences(of: "\n\n\n\n\n", with: "\n\n\n")
 
         // 시작과 끝의 공백/줄바꿈 정리
         formatted = formatted.trimmingCharacters(in: .whitespacesAndNewlines)
