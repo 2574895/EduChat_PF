@@ -157,8 +157,8 @@ final class ChatManager: ObservableObject {
             return
         }
 
-        // 첫 번째 사용자 메시지를 보낼 때 환영 메시지 제거
-        if session.messages.count == 1 && !session.messages[0].isFromUser {
+        // 첫 번째 사용자 메시지를 보낼 때 환영 메시지 제거 (일반 모드에서만)
+        if !fullStudyMode && session.messages.count == 1 && !session.messages[0].isFromUser {
             session.messages.removeAll()
         }
 
