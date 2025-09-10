@@ -120,11 +120,28 @@ Xcode Navigator → EduChat → Build Settings
 
 ### 문제: `'No such module 'MarkdownUI'` 에러
 
-#### **1단계: 패키지 상태 확인**
+#### **1단계: 로컬 패키지 폴더 확인**
+```bash
+# 프로젝트 루트에 Packages 폴더가 있는지 확인:
+/Users/test/renew_project/EduChat/Packages/MarkdownUI/
+- Package.swift 파일이 있어야 함 ✅
+- Sources 폴더가 있어야 함 ✅
 ```
-Xcode 왼쪽 Navigator → EduChat → Dependencies
-- MarkdownUI가 목록에 있는지 확인
-- 없으면: File → Add Packages... 진행
+
+#### **2단계: Xcode에서 로컬 패키지 추가**
+```
+Xcode 메뉴: File → Add Packages...
+
+방법 1 - 로컬 패키지 선택:
+- 하단의 "Add Local..." 버튼 클릭
+- Packages 폴더 선택
+- MarkdownUI 폴더 선택
+
+방법 2 - 경로 직접 입력:
+- 검색창에 다음 경로 입력:
+/Users/test/renew_project/EduChat/Packages/MarkdownUI
+
+- Add Package 클릭
 ```
 
 #### **2단계: 패키지 완전 제거 후 재설치**
