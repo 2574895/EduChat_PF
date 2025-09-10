@@ -195,6 +195,9 @@
 			);
 			mainGroup = 5283A7C12E6DDBF500906B52;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				52614C712E719D3100EA9535 /* XCLocalSwiftPackageReference "../../Downloads/swift-markdown-ui-main" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5283A7CB2E6DDBF500906B52 /* Products */;
 			projectDirPath = "";
@@ -539,6 +542,13 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		52614C712E719D3100EA9535 /* XCLocalSwiftPackageReference "../../Downloads/swift-markdown-ui-main" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../Downloads/swift-markdown-ui-main";
+		};
+/* End XCLocalSwiftPackageReference section */
 	};
 	rootObject = 5283A7C22E6DDBF500906B52 /* Project object */;
 }
