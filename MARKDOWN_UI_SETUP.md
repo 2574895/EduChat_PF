@@ -6,35 +6,43 @@ SwiftUI에서 마크다운을 아름답게 렌더링하는 라이브러리
 - SwiftUI 네이티브 지원
 - 풍부한 마크다운 기능 지원
 
-## 🚨 긴급 문제 해결: cmark_gfm 모듈 에러
+## ✅ Swift Package Manager로 MarkdownUI 추가 (권장)
 
-### 문제 상황:
-```
-Command SwiftCompile failed with a nonzero exit code
-No such module 'cmark_gfm'
-```
+### 📋 단계별 설치 가이드
 
-### ⚠️ 수동 설치 방식의 한계:
-- ❌ cmark_gfm C 라이브러리 누락
-- ❌ NetworkImage 의존성 문제
-- ❌ 복잡한 수동 관리 필요
-
-### ✅ 권장 해결 방법:
-**Swift Package Manager를 사용하세요!**
-
-#### 1단계: 기존 파일들 제거
+#### 1단계: Xcode에서 패키지 추가
 ```bash
-cd /Users/test/renew_project/EduChat
-rm -rf EduChat/EduChat/Services/MarkdownUI
+# Xcode 메뉴에서:
+File → Add Packages... (또는 Add Package Dependencies)
 ```
 
-#### 2단계: Swift Package Manager로 설치
-```bash
-# Xcode에서:
-# File → Add Packages...
-# URL: https://github.com/gonzalezreal/swift-markdown-ui
-# Version: Up to Next Major (2.0.0+)
-# Add to Target: EduChat
+#### 2단계: 패키지 URL 입력
+```
+🔍 검색창에 입력:
+https://github.com/gonzalezreal/swift-markdown-ui
+```
+
+#### 3단계: 버전 및 설정
+```
+📦 Dependency Rule:
+- Branch: main (또는 Up to Next Major)
+- Version: 2.0.0 이상 권장
+
+🎯 Add to Target:
+- EduChat ✅
+- 다른 타겟들은 선택 해제
+```
+
+#### 4단계: 설치 완료 대기
+```
+⏳ Package resolving... (약 30초-1분 소요)
+✅ Successfully resolved package
+```
+
+#### 5단계: Navigator에서 확인
+```
+Xcode 왼쪽 Navigator → EduChat → Dependencies
+- MarkdownUI가 목록에 있는지 확인 ✅
 ```
 
 ---

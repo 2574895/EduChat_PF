@@ -1,4 +1,5 @@
 import SwiftUI
+import MarkdownUI
 
 struct MessageBubble: View {
     let message: Message
@@ -55,9 +56,10 @@ struct MessageBubble: View {
                         }
                 }
             } else {
-                // 기본 SwiftUI Text 사용 - 간단한 마크다운 스타일링
+                // MarkdownUI 사용 - 풍부한 마크다운 렌더링
                 if #available(macOS 12.0, *) {
-                    Text(.init(formattedContent))
+                    Markdown(formattedContent)
+                        .markdownTheme(.gitHub)
                         .padding(14)
                         .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
                         .foregroundColor(.primary)
@@ -87,7 +89,7 @@ struct MessageBubble: View {
                             }
                         }
                 } else {
-                    // macOS 12.0 미만에서는 기존 방식 사용 (하위 호환성)
+                    // macOS 12.0 미만에서는 Text 사용 (하위 호환성)
                     Text(.init(formattedContent))
                         .padding(14)
                         .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
