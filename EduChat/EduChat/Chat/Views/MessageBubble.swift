@@ -25,13 +25,24 @@ struct MessageBubble: View {
                 .replacingOccurrences(of: "6. 한계와 미래 전망", with: "**6. ⚖️ 한계와 미래 전망**")
         }
 
-        // 일반 모드 응답 포맷팅
-        if message.content.contains("1. 비유를 통한 핵심 요약") ||
-           message.content.contains("2. 개념의 역사") {
+        // 일반 모드 응답 포맷팅 - 강력하고 간단한 변환
+        var formatted = message.content
 
-            return message.content
-                .replacingOccurrences(of: "1. 비유를 통한 핵심 요약", with: "**📌 비유를 통한 핵심 요약**")
-                .replacingOccurrences(of: "2. 개념의 역사", with: "**📚 개념의 역사**")
+        // 1. "비유를 통한 핵심 요약" 섹션 변환
+        if formatted.contains("비유를 통한 핵심 요약") {
+            // 섹션 앞에 줄바꿈 추가하고 마크다운 헤더로 변환
+            formatted = formatted.replacingOccurrences(of: "비유를 통한 핵심 요약", with: "\n**📌 비유를 통한 핵심 요약**\n")
+        }
+
+        // 2. "개념의 역사" 섹션 변환
+        if formatted.contains("개념의 역사") {
+            // 섹션 앞에 줄바꿈 추가하고 마크다운 헤더로 변환
+            formatted = formatted.replacingOccurrences(of: "개념의 역사", with: "\n\n**📚 개념의 역사**\n")
+        }
+
+        // 변환된 내용이 원본과 다르면 변환된 내용 반환
+        if formatted != message.content {
+            return formatted
         }
 
         return message.content
