@@ -6,7 +6,7 @@ SwiftUI에서 마크다운을 아름답게 렌더링하는 라이브러리
 - SwiftUI 네이티브 지원
 - 풍부한 마크다운 기능 지원
 
-## 📋 Xcode에서 추가하기
+## 📋 방법 1: Swift Package Manager (권장) ⭐
 
 ### 1단계: Xcode 열기
 ```bash
@@ -29,6 +29,56 @@ https://github.com/gonzalezreal/swift-markdown-ui
 
 ### 5단계: 타겟 선택
 - EduChat 타겟에 추가
+
+---
+
+## 📋 방법 2: 직접 파일 복사 (수동)
+
+### 1단계: GitHub에서 소스 다운로드
+```bash
+# 프로젝트 루트에서 실행
+cd /Users/test/renew_project/EduChat
+
+# swift-markdown-ui 다운로드
+git clone https://github.com/gonzalezreal/swift-markdown-ui.git temp_markdown_ui
+```
+
+### 2단계: 필요한 파일들 프로젝트에 복사
+```bash
+# Sources 폴더의 파일들을 EduChat 프로젝트에 복사
+mkdir -p EduChat/EduChat/Services/MarkdownUI
+cp -r temp_markdown_ui/Sources/MarkdownUI/* EduChat/EduChat/Services/MarkdownUI/
+
+# 임시 폴더 삭제
+rm -rf temp_markdown_ui
+```
+
+### 3단계: Xcode에서 파일들 추가
+```
+Xcode에서:
+1. 왼쪽 Navigator에서 EduChat 폴더 우클릭
+2. "Add Files to 'EduChat'..." 선택
+3. EduChat/EduChat/Services/MarkdownUI 폴더 선택
+4. "Copy items if needed" 체크 ✅
+5. "Add to targets: EduChat" 체크 ✅
+```
+
+### 4단계: 복사된 파일 구조 확인
+```
+EduChat/EduChat/Services/MarkdownUI/
+├── Markdown.swift
+├── MarkdownImageHandler.swift
+├── MarkdownView.swift
+├── Theme+Basic.swift
+├── Theme+GitHub.swift
+└── ... (다른 Swift 파일들)
+```
+
+### 5단계: 빌드 테스트
+```bash
+# Xcode에서 Clean Build (⌘+Shift+K)
+# 그 다음 Build (⌘+B)
+```
 
 ## 🔧 코드 활성화
 
