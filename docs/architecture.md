@@ -10,26 +10,36 @@
 │   (View)        │◄──►│  (ViewModel)    │◄──►│   (Service)     │
 │                 │    │                 │    │                 │
 │ • UI 표시       │    │ • 상태 관리     │    │ • API 통신      │
-│ • 사용자 입력   │    │ • 비즈니스 로직 │    │ • 응답 처리     │
+│ • MarkdownUI    │    │ • 비즈니스 로직 │    │ • 응답 처리     │
 │ • 이벤트 처리   │    │ • 데이터 변환   │    │ • 에러 처리     │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
          ▲                       ▲                       ▲
          │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │   UserDefaults  │
-                    │  (Persistence)  │
-                    │                 │
-                    │ • API 키 저장   │
-                    │ • 설정 저장     │
-                    │ • 대화 기록     │
-                    └─────────────────┘
+         └───────────────────────┼───────────────────────┼───────────────────────┘
+                                 │                       │
+                    ┌─────────────────┐    ┌─────────────────┐
+                    │ AIResponseFormat│    │   UserDefaults  │
+                    │     ter         │    │  (Persistence)  │
+                    │                 │    │                 │
+                    │ • 마크다운 변환 │    │ • API 키 저장   │
+                    │ • 구조화 포맷팅 │    │ • 설정 저장     │
+                    │ • 이모지 추가   │    │ • 대화 기록     │
+                    └─────────────────┘    └─────────────────┘
+                                             ▲
+                                             │
+                                 ┌─────────────────┐
+                                 │   MarkdownUI    │
+                                 │  (Library)      │
+                                 │                 │
+                                 │ • 렌더링 엔진   │
+                                 │ • 테마 지원     │
+                                 │ • GitHub 스타일 │
+                                 └─────────────────┘
 ```
 
 ## 🔄 데이터 플로우
 
-### 1. 사용자 입력 → AI 응답
+### 1. 사용자 입력 → AI 응답 (MarkdownUI 렌더링 포함)
 
 ```mermaid
 sequenceDiagram
@@ -38,6 +48,8 @@ sequenceDiagram
     participant VM as ChatManager
     participant S as OpenAIService
     participant A as OpenAI API
+    participant F as AIResponseFormatter
+    participant M as MarkdownUI
 
     U->>V: 메시지 입력
     V->>VM: sendMessage()
@@ -45,8 +57,12 @@ sequenceDiagram
     VM->>S: generateReply()
     S->>A: HTTP 요청
     A-->>S: JSON 응답
-    S-->>VM: 처리된 응답
-    VM-->>V: UI 업데이트
+    S-->>VM: 원본 텍스트 응답
+    VM->>F: 마크다운 변환 요청
+    F-->>VM: 구조화된 마크다운
+    VM->>V: UI 업데이트
+    V->>M: MarkdownUI 렌더링
+    M-->>V: 스타일링된 콘텐츠
     V-->>U: 응답 표시
 ```
 
@@ -198,16 +214,86 @@ class OpenAIService {
 }
 ```
 
-### UI 컴포넌트 계층
+### UI 컴포넌트 계층 (MarkdownUI 통합)
 ```swift
 struct ChatView: View {
     @ObservedObject var chatManager: ChatManager
 
     var body: some View {
         VStack {
-            ScrollView { /* 메시지 리스트 */ }
+            ScrollView {
+                ForEach(chatManager.messages) { message in
+                    MessageBubble(message: message) // MarkdownUI 렌더링
+                }
+            }
             InputView(chatManager: chatManager)
         }
+    }
+}
+
+struct MessageBubble: View {
+    let message: Message
+
+    var body: some View {
+        HStack {
+            if message.isFromUser {
+                // 사용자 메시지
+                Text(message.content)
+            } else {
+                // AI 메시지 - MarkdownUI 렌더링
+                Markdown(message.content)
+                    .markdownTheme(.gitHub)
+                    .padding(14)
+                    .background(Color.secondary.opacity(0.2))
+                    .cornerRadius(12)
+            }
+        }
+    }
+}
+```
+
+### 마크다운 응답 포맷터
+```swift
+class AIResponseFormatter {
+    enum AIMode {
+        case normal, deepLearning
+    }
+
+    func format(_ response: String, mode: AIMode) -> String {
+        switch mode {
+        case .normal:
+            return formatNormalResponse(response)
+        case .deepLearning:
+            return formatDeepLearningResponse(response)
+        }
+    }
+
+    private func formatNormalResponse(_ response: String) -> String {
+        // 일반모드: 비유 + 역사 (2섹션)
+        return response
+            .replacingOccurrences(of: "비유를 통한 핵심 요약",
+                                with: "\n\n### 📖 비유를 통한 핵심 요약\n\n")
+            .replacingOccurrences(of: "개념의 역사",
+                                with: "\n\n### 📚 개념의 역사\n\n")
+    }
+
+    private func formatDeepLearningResponse(_ response: String) -> String {
+        // 딥러닝모드: 6단계 심층 분석
+        let patterns = [
+            "개념의 핵심 본질 파악": "## 1. 🧠 개념의 핵심 본질 파악",
+            "표면과 관계성 분석": "## 2. 🔍 표면과 관계성 분석",
+            "원리와 구현 방법": "## 3. ⚙️ 원리와 구현 방법",
+            "응용과 활용 분야": "## 4. 🌐 응용과 활용 분야",
+            "역사적 발전과 맥락": "## 5. 📚 역사적 발전과 맥락",
+            "한계와 미래 전망": "## 6. ⚖️ 한계와 미래 전망"
+        ]
+
+        var formatted = response
+        for (original, replacement) in patterns {
+            formatted = formatted.replacingOccurrences(of: original,
+                                                     with: "\n\n\(replacement)\n\n")
+        }
+        return formatted
     }
 }
 ```

@@ -81,13 +81,14 @@
 📱 SwiftUI            // UI 프레임워크
 🖥️ macOS 13.0+        // 타겟 플랫폼
 🤖 OpenAI GPT-5-nano  // AI 엔진 (비용 효율성 고려)
+📝 MarkdownUI         // 마크다운 렌더링 라이브러리
 ```
 
 ### AI/ML Technologies
 ```swift
-🧠 온톨로지 & 지식 그래프  // 개념 계층 모델링
-🔍 벡터 임베딩           // 의미 기반 검색 (계획 단계)
-🎯 개인화 알고리즘        // 최적 학습경로 추천
+🧠 온톨로지 & 지식 그래프  // 개념 계층 모델링 (향후 구현 예정)
+🔍 벡터 임베딩           // 의미 기반 검색 (향후 구현 예정)
+🎯 개인화 알고리즘        // 최적 학습경로 추천 (향후 구현 예정)
 ```
 
 ### Architecture Components
@@ -96,6 +97,7 @@
 🔄 Combine            // 반응형 프로그래밍
 💾 UserDefaults       // 로컬 데이터 저장
 🌐 URLSession         // 네트워크 통신
+📝 AIResponseFormatter // 마크다운 응답 포맷터
 ```
 
 ### Development Tools
@@ -106,11 +108,9 @@
 🧪 XCTest             // 유닛 테스트 (향후 구현 예정)
 ```
 
-### Research & Design Tools
+### AI Tool
 ```swift
-🎨 Figma AI           // UI/UX 디자인
 💻 Cursor AI          // AI 지원 개발
-🌐 Replit, Vercel     // 웹 개발 플랫폼
 ```
 
 ---
@@ -121,14 +121,24 @@
 
 ```
 EduChat/
-├── EduChatApp.swift          # 앱 엔트리포인트
+├── EduChatApp.swift              # 앱 엔트리포인트
 ├── Chat/
-│   ├── Models/               # 데이터 모델
-│   ├── Views/                # UI 컴포넌트
-│   └── ChatManager.swift     # 비즈니스 로직
-└── Services/
-    ├── OpenAIService.swift   # AI 통합
-    └── Constants.swift       # 설정 상수
+│   ├── Models/                   # 데이터 모델
+│   │   ├── ChatSession.swift     # 채팅 세션
+│   │   └── Message.swift         # 메시지 모델
+│   ├── Views/                    # UI 컴포넌트
+│   │   ├── ChatView.swift        # 메인 채팅 화면
+│   │   ├── MessageBubble.swift   # 메시지 버블 (MarkdownUI 통합)
+│   │   ├── InputView.swift       # 입력 컴포넌트
+│   │   ├── SettingsView.swift    # 설정 화면
+│   │   └── ChatHistoryView.swift # 채팅 기록
+│   └── ChatManager.swift         # 비즈니스 로직 (상태 관리)
+├── Services/
+│   ├── OpenAIService.swift       # OpenAI API 통합
+│   ├── AIResponseFormatter.swift # 마크다운 응답 포맷터
+│   ├── MarkdownUI/               # 마크다운 렌더링 라이브러리
+│   └── Constants.swift           # 설정 상수
+└── docs/                         # 프로젝트 문서
 ```
 
 ### 🔄 MVVM 플로우
@@ -339,8 +349,6 @@ copies or substantial portions of the Software.
 - **교육 격차 해소**: 중학생이라도 고등학교-대학 교육을 기다리지 않고 즉시 딥테크 진입 가능
 - **노동시장 다양성**: 40대 성인들도 기존 경력을 바탕으로 빠르게 딥테크 분야 전환 가능
 
-⭐ [GitHub](https://github.com/your-username/EduChat) | 📧 [Contact](#)
-
-*Made with ❤️ and SwiftUI*
+⭐ [GitHub](https://github.com/your-username/EduChat)
 
 </div>

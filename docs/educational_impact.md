@@ -31,29 +31,46 @@ graph TD
     B --> C[표면적 이해]
     C --> D[단기 기억]
     D --> E[빠른 망각]
+    B --> F[형식 없는 텍스트]
+    F --> G[가독성 저하]
+    G --> H[집중력 저하]
 
     style A fill:#ffebee
     style B fill:#ffcdd2
     style C fill:#ef9a9a
     style D fill:#e57373
     style E fill:#f44336,color:#fff
+    style F fill:#ff9800
+    style G fill:#ff5722
+    style H fill:#d84315,color:#fff
 ```
 
-### EduChat의 혁신적 접근
+### EduChat의 혁신적 접근 (MarkdownUI 강화)
 ```mermaid
 graph TD
     A[EduChat] --> B[사전 질문 시스템]
     B --> C[개인화된 학습 계획]
     C --> D[6단계 심층 분석]
-    D --> E[블룸 목표 달성]
-    E --> F[지속적 역량 개발]
+    D --> E[MarkdownUI 시각화]
+    E --> F[블룸 목표 달성]
+    F --> G[지속적 역량 개발]
+
+    E --> H[헤더 스타일링]
+    E --> I[구조화된 레이아웃]
+    E --> J[코드블록 구문 강조]
+    E --> K[시각적 계층 구조]
 
     style A fill:#e8f5e8
     style B fill:#c8e6c9
     style C fill:#a5d6a7
     style D fill:#81c784
-    style E fill:#66bb6a
-    style F fill:#4caf50,color:#fff
+    style E fill:#4db6ac
+    style F fill:#26a69a
+    style G fill:#009688,color:#fff
+    style H fill:#b2dfdb
+    style I fill:#80cbc4
+    style J fill:#4db6ac
+    style K fill:#26a69a
 ```
 
 ## 🎓 학습 효과 측정 프레임워크
@@ -151,8 +168,16 @@ EduChat: "어떻게 분석하고 설명할지 스스로 계획하세요" → 자
 ### 독특한 가치 제안
 1. **비고츠키 목표 실현**: 최상위 교육 목표 직접 달성
 2. **자율적 역량 배양**: 강요하지 않고 스스로 성장
-3. **딥테크 전문성**: AI/데이터 분야 특화
-4. **지속적 성장**: 평생 학습 습관 형성
+3. **MarkdownUI 시각화**: 구조화된 콘텐츠로 학습 효율성 극대화
+4. **딥테크 전문성**: AI/데이터 분야 특화
+5. **지속적 성장**: 평생 학습 습관 형성
+
+### MarkdownUI 교육적 효과
+- **시각적 계층 구조**: 헤더/리스트로 개념 구조 명확화
+- **코드블록 구문 강조**: 프로그래밍 학습 시 가독성 향상
+- **테이블/링크 지원**: 복잡한 정보 체계적 전달
+- **반응형 디자인**: 다양한 디바이스에서 최적 학습 경험
+- **접근성 향상**: 스크린 리더 지원으로 포용성 확대
 
 ## 🚀 미래 확장 가능성
 
