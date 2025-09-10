@@ -1,10 +1,17 @@
 import SwiftUI
+// import MarkdownUI // Swift Package Manager에서 추가 필요
 
 struct MessageBubble: View {
     let message: Message
     @State private var isHovered = false
 
-    // ChatManager에서 이미 마크다운으로 변환된 응답을 그대로 사용
+    // MarkdownUI 사용 시
+    private var markdownContent: String {
+        // AIResponseFormatter에서 변환된 마크다운 콘텐츠 사용
+        return message.content
+    }
+
+    // 기존 방식 (fallback)
     private var formattedContent: String {
         return message.content
     }
@@ -55,6 +62,34 @@ struct MessageBubble: View {
                         }
                 }
             } else {
+                // MarkdownUI 사용 (라이브러리가 추가되면 활성화)
+                /*
+                if #available(macOS 12.0, *) {
+                    Markdown(markdownContent)
+                        .padding(14)
+                        .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
+                        .foregroundColor(.primary)
+                        .cornerRadius(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .textSelection(.enabled)
+                        .onHover { hovering in
+                            isHovered = hovering
+                        }
+                        .contextMenu {
+                            Button(action: {
+                                NSPasteboard.general.clearContents()
+                                NSPasteboard.general.setString(markdownContent, forType: .string)
+                            }) {
+                                Text("복사")
+                                Image(systemName: "doc.on.doc")
+                            }
+                        }
+                } else {
+                    // MarkdownUI를 사용할 수 없는 경우 기존 방식으로 fallback
+                }
+                */
+
+                // 현재 방식 (MarkdownUI 추가 전까지 사용)
                 if #available(macOS 12.0, *) {
                     Text(.init(formattedContent))
                         .padding(14)
