@@ -47,6 +47,75 @@ Xcode 왼쪽 Navigator → EduChat → Dependencies
 
 ---
 
+## 🚨 현재 에러 해결 가이드
+
+### 문제: `'No such module 'MarkdownUI'` 에러
+
+### ✅ 단계별 문제 해결:
+
+#### **1단계: 패키지 상태 확인**
+```bash
+Xcode 왼쪽 Navigator → EduChat → Dependencies
+- MarkdownUI가 있는지 확인
+- 없으면 다시 Add Packages... 진행
+```
+
+#### **2단계: 타겟 설정 확인**
+```bash
+Xcode Navigator → EduChat → Dependencies → MarkdownUI
+- 우클릭 → "Show in Finder"
+- 또는 Build Phases → Link Binary With Libraries 확인
+```
+
+#### **3단계: 클린 빌드**
+```bash
+Xcode 메뉴:
+Product → Clean Build Folder (⌘+Shift+K)
+```
+
+#### **4단계: 캐시 삭제 및 재빌드**
+```bash
+# 터미널에서 (Xcode 닫고 실행):
+rm -rf ~/Library/Developer/Xcode/DerivedData
+
+# Xcode 다시 열기
+# Product → Build (⌘+B)
+```
+
+#### **5단계: 패키지 재추가 (필요시)**
+```bash
+# 기존 패키지 제거 후 재추가:
+Xcode Navigator → EduChat → Dependencies
+- MarkdownUI 우클릭 → Delete
+- 다시 Add Packages... 진행
+```
+
+#### **6단계: 빌드 설정 확인**
+```bash
+Xcode Navigator → EduChat → Build Settings
+- 검색: "Swift Compiler - Search Paths"
+- "Import Paths" 확인
+```
+
+---
+
+### 🔧 임시 해결 (현재 적용됨):
+
+#### **MessageBubble.swift 임시 수정:**
+```swift
+// import MarkdownUI // 임시 주석 처리
+// Markdown() 대신 Text() 사용 중
+```
+
+#### **MarkdownUI 활성화 방법:**
+```swift
+// 패키지 확인 후 아래 주석 해제:
+// import MarkdownUI
+// Markdown(content).markdownTheme(.gitHub)
+```
+
+---
+
 ## 📋 방법 1: Swift Package Manager (권장) ⭐
 
 ### 1단계: Xcode 열기
