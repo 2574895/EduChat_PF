@@ -30,6 +30,35 @@ final class ChatManager: ObservableObject {
     private let openAIService = OpenAIService()
     private let sessionsKey = "chat_sessions"
 
+    // LLM 응답 캐싱을 위한 메모리 캐시
+    private var responseCache = [String: String]()
+    private let maxCacheSize = 20 // 최대 캐시 개수
+
+    // 캐시 키 생성
+    private func cacheKey(for prompt: String, isStudyMode: Bool) -> String {
+        return "\(isStudyMode ? "study" : "normal")_\(prompt.hashValue)"
+    }
+
+    // 캐시에서 응답 가져오기
+    private func getCachedResponse(for prompt: String, isStudyMode: Bool) -> String? {
+        let key = cacheKey(for: prompt, isStudyMode: isStudyMode)
+        return responseCache[key]
+    }
+
+    // 캐시에 응답 저장
+    private func cacheResponse(_ response: String, for prompt: String, isStudyMode: Bool) {
+        let key = cacheKey(for: prompt, isStudyMode: isStudyMode)
+        responseCache[key] = response
+
+        // 캐시 크기 제한
+        if responseCache.count > maxCacheSize {
+            // 가장 오래된 항목 제거 (간단한 구현)
+            if let firstKey = responseCache.keys.first {
+                responseCache.removeValue(forKey: firstKey)
+            }
+        }
+    }
+
     var currentSession: ChatSession? {
         guard let sessionId = currentSessionId else { return nil }
         return sessions.first(where: { $0.id == sessionId })
@@ -305,23 +334,44 @@ final class ChatManager: ObservableObject {
             saveSessions()
         }
 
-        Task {
+        Task { @MainActor in
             do {
                 isLoading = true
-                let resp = try await openAIService.generateReply(prompt: text, isStudyMode: fullStudyMode)
-                let assistant = Message(content: resp, isFromUser: false)
+                errorMessage = nil
 
-                // 세션에 AI 응답 추가
-                if var updatedSession = currentSession {
-                    updatedSession.addMessage(assistant)
-                    if let index = sessions.firstIndex(where: { $0.id == updatedSession.id }) {
-                        sessions[index] = updatedSession
-                        saveSessions()
-                    }
+                var resp: String
+
+                // 1. 캐시에서 응답 확인
+                if let cachedResponse = getCachedResponse(for: text, isStudyMode: fullStudyMode) {
+                    resp = cachedResponse
+                    print("📋 캐시된 LLM 응답 사용: \(resp.prefix(100))...")
+                } else {
+                    // 2. 캐시에 없으면 API 호출
+                    resp = try await openAIService.generateReply(prompt: text, isStudyMode: fullStudyMode)
+                    // 3. 응답 캐싱
+                    cacheResponse(resp, for: text, isStudyMode: fullStudyMode)
+                    print("🤖 새로운 LLM 응답 수신 및 캐싱: \(resp.prefix(100))...")
                 }
 
+                let assistant = Message(content: resp, isFromUser: false)
+
+                // 현재 세션에 AI 응답 추가
+                guard let currentSessionId = currentSessionId,
+                      let sessionIndex = sessions.firstIndex(where: { $0.id == currentSessionId }) else {
+                    print("❌ 현재 세션을 찾을 수 없음")
+                    isLoading = false
+                    return
+                }
+
+                // 세션 업데이트 (Published 프로퍼티를 통해 UI 자동 업데이트)
+                sessions[sessionIndex].addMessage(assistant)
+                saveSessions()
+
+                print("✅ AI 응답 추가 완료 - 메시지 개수: \(sessions[sessionIndex].messages.count)")
                 isLoading = false
+
             } catch {
+                print("❌ LLM 호출 에러: \(error)")
                 isLoading = false
                 if let urlError = error as? URLError, urlError.code == .timedOut {
                     errorMessage = "응답 시간이 너무 오래 걸립니다. 잠시 후 다시 시도해주세요.\n(딥러닝 모드는 긴 응답을 생성하므로 시간이 더 걸릴 수 있습니다)"
@@ -335,23 +385,41 @@ final class ChatManager: ObservableObject {
     private func processFinalQuestion(_ finalQuestion: String, session: ChatSession) {
         var session = session
 
-        Task {
+        Task { @MainActor in
             do {
                 isLoading = true
-                let resp = try await openAIService.generateReply(prompt: finalQuestion, isStudyMode: true)
-                let assistant = Message(content: resp, isFromUser: false)
+                errorMessage = nil
 
-                // 세션에 AI 응답 추가
-                if var updatedSession = currentSession {
-                    updatedSession.addMessage(assistant)
-                    if let index = sessions.firstIndex(where: { $0.id == updatedSession.id }) {
-                        sessions[index] = updatedSession
-                        saveSessions()
-                    }
+                var resp: String
+
+                // 캐시에서 응답 확인 (딥러닝 모드 최종 질문용)
+                if let cachedResponse = getCachedResponse(for: finalQuestion, isStudyMode: true) {
+                    resp = cachedResponse
+                    print("📋 캐시된 최종 LLM 응답 사용: \(resp.prefix(100))...")
+                } else {
+                    resp = try await openAIService.generateReply(prompt: finalQuestion, isStudyMode: true)
+                    cacheResponse(resp, for: finalQuestion, isStudyMode: true)
+                    print("🎯 새로운 최종 LLM 응답 수신 및 캐싱: \(resp.prefix(100))...")
                 }
 
+                let assistant = Message(content: resp, isFromUser: false)
+
+                // 현재 세션에 AI 응답 추가
+                guard let currentSessionId = currentSessionId,
+                      let sessionIndex = sessions.firstIndex(where: { $0.id == currentSessionId }) else {
+                    print("❌ 최종 응답 처리 - 현재 세션을 찾을 수 없음")
+                    isLoading = false
+                    return
+                }
+
+                sessions[sessionIndex].addMessage(assistant)
+                saveSessions()
+
+                print("✅ 최종 AI 응답 추가 완료 - 메시지 개수: \(sessions[sessionIndex].messages.count)")
                 isLoading = false
+
             } catch {
+                print("❌ 최종 LLM 호출 에러: \(error)")
                 isLoading = false
                 if let urlError = error as? URLError, urlError.code == .timedOut {
                     errorMessage = "응답 시간이 너무 오래 걸립니다. 잠시 후 다시 시도해주세요.\n(딥러닝 모드는 긴 응답을 생성하므로 시간이 더 걸릴 수 있습니다)"
