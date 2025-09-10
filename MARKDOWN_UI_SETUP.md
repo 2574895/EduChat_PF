@@ -239,6 +239,100 @@ rm -rf temp_markdown
 
 ---
 
+## 🚨 긴급: 패키지 참조 충돌 에러 해결
+
+### 에러 메시지:
+```
+Could not compute dependency graph: unable to load transferred PIF:
+The workspace contains multiple references with the same GUID
+'PACKAGE:0WDG2B50H5GPAAR4LATT01TOKOQW8PETT::MAINGROUP'
+```
+
+### ✅ 단계별 해결:
+
+#### **1단계: 완전 초기화**
+```bash
+# 터미널에서 (Xcode 닫고 실행):
+rm -rf ~/Library/Developer/Xcode/DerivedData
+find /Users/test/renew_project/EduChat -name "Package.resolved" -delete
+```
+
+#### **2단계: Xcode에서 패키지 완전 제거**
+```
+Xcode Navigator → EduChat → Dependencies
+- MarkdownUI 우클릭 → Delete (완전 제거)
+- 프로젝트 저장: File → Save (⌘+S)
+```
+
+#### **3단계: 프로젝트 클린**
+```
+Xcode 메뉴:
+Product → Clean Build Folder (⌘+Shift+K)
+```
+
+#### **4단계: Xcode 완전 재시작**
+```
+Xcode 완전히 닫기 (⌘+Q)
+프로젝트 다시 열기: File → Open Recent
+```
+
+#### **5단계: 로컬 패키지 재추가**
+```
+File → Add Packages...
+"Add Local..." 버튼 클릭
+Packages/MarkdownUI 폴더 선택
+EduChat 타겟만 체크 ✅
+"Add Package" 클릭
+```
+
+#### **6단계: 빌드 테스트**
+```
+Product → Build (⌘+B)
+✅ "Build Succeeded" 확인
+```
+
+---
+
+### 🔍 추가 문제 해결:
+
+#### **프로젝트 파일 수동 편집 (필요시):**
+```bash
+# .pbxproj 파일에서 중복 참조 확인:
+nano /Users/test/renew_project/EduChat/EduChat.xcodeproj/project.pbxproj
+
+# PACKAGE:로 시작하는 중복 라인 검색
+# 중복된 패키지 참조 삭제 (주의: 백업 필수)
+```
+
+#### **새 프로젝트 생성 (최후의 수단):**
+```bash
+# 기존 프로젝트 백업 후:
+# File → New → Project
+# SwiftUI App 템플릿 선택
+# 기존 파일들 수동 복사
+```
+
+---
+
+### 💡 예방 방법:
+
+#### **향후 패키지 추가 시:**
+- ✅ **한 번에 하나의 패키지만 추가**
+- ✅ **추가 전 기존 패키지 상태 확인**
+- ✅ **에러 발생 시 즉시 클린 빌드**
+- ✅ **프로젝트 저장 후 패키지 추가**
+
+#### **안전한 작업 순서:**
+```
+1. 프로젝트 열기
+2. Clean Build Folder
+3. 패키지 추가/제거
+4. 프로젝트 저장
+5. 빌드 테스트
+```
+
+---
+
 ## 📋 방법 1: Swift Package Manager (권장) ⭐
 
 ### 1단계: Xcode 열기

@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		52614C732E719F0800EA9535 /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 52614C722E719F0800EA9535 /* MarkdownUI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		5283A7D92E6DDBF600906B52 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				52614C732E719F0800EA9535 /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = EduChat;
 			packageProductDependencies = (
+				52614C722E719F0800EA9535 /* MarkdownUI */,
 			);
 			productName = EduChat;
 			productReference = 5283A7CA2E6DDBF500906B52 /* EduChat.app */;
@@ -549,6 +555,13 @@
 			relativePath = "../../Downloads/swift-markdown-ui-main";
 		};
 /* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		52614C722E719F0800EA9535 /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MarkdownUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5283A7C22E6DDBF500906B52 /* Project object */;
 }
