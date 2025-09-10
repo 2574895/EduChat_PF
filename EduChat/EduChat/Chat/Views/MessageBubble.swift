@@ -8,41 +8,70 @@ struct MessageBubble: View {
     private var formattedContent: String {
         guard !message.isFromUser else { return message.content }
 
-        // 딥러닝 모드 응답 포맷팅
-        if message.content.contains("1. 개념의 핵심 본질 파악") ||
-           message.content.contains("2. 표면과 관계성 분석") ||
-           message.content.contains("3. 원리와 구현 방법") ||
-           message.content.contains("4. 응용과 활용 분야") ||
-           message.content.contains("5. 역사적 발전과 맥락") ||
-           message.content.contains("6. 한계와 미래 전망") {
+        // 딥러닝 모드 응답 포맷팅 - 강력한 패턴 매칭
+        var formatted = message.content
+        var hasChanges = false
 
-            return message.content
-                .replacingOccurrences(of: "1. 개념의 핵심 본질 파악", with: "**1. 🧠 개념의 핵심 본질 파악**")
-                .replacingOccurrences(of: "2. 표면과 관계성 분석", with: "**2. 🔍 표면과 관계성 분석**")
-                .replacingOccurrences(of: "3. 원리와 구현 방법", with: "**3. ⚙️ 원리와 구현 방법**")
-                .replacingOccurrences(of: "4. 응용과 활용 분야", with: "**4. 🌐 응용과 활용 분야**")
-                .replacingOccurrences(of: "5. 역사적 발전과 맥락", with: "**5. 📚 역사적 발전과 맥락**")
-                .replacingOccurrences(of: "6. 한계와 미래 전망", with: "**6. ⚖️ 한계와 미래 전망**")
+        // 1. 개념의 핵심 본질 파악 (유연한 매칭)
+        if formatted.contains("개념의 핵심 본질 파악") {
+            formatted = formatted.replacingOccurrences(of: "개념의 핵심 본질 파악", with: "**1. 🧠 개념의 핵심 본질 파악**\n")
+            hasChanges = true
+        }
+
+        // 2. 표면과 관계성 분석 (유연한 매칭)
+        if formatted.contains("표면과 관계성 분석") {
+            formatted = formatted.replacingOccurrences(of: "표면과 관계성 분석", with: "\n\n**2. 🔍 표면과 관계성 분석**\n")
+            hasChanges = true
+        }
+
+        // 3. 원리와 구현 방법 (유연한 매칭)
+        if formatted.contains("원리와 구현 방법") {
+            formatted = formatted.replacingOccurrences(of: "원리와 구현 방법", with: "\n\n**3. ⚙️ 원리와 구현 방법**\n")
+            hasChanges = true
+        }
+
+        // 4. 응용과 활용 분야 (유연한 매칭)
+        if formatted.contains("응용과 활용 분야") {
+            formatted = formatted.replacingOccurrences(of: "응용과 활용 분야", with: "\n\n**4. 🌐 응용과 활용 분야**\n")
+            hasChanges = true
+        }
+
+        // 5. 역사적 발전과 맥락 (유연한 매칭)
+        if formatted.contains("역사적 발전과 맥락") {
+            formatted = formatted.replacingOccurrences(of: "역사적 발전과 맥락", with: "\n\n**5. 📚 역사적 발전과 맥락**\n")
+            hasChanges = true
+        }
+
+        // 6. 한계와 미래 전망 (유연한 매칭)
+        if formatted.contains("한계와 미래 전망") {
+            formatted = formatted.replacingOccurrences(of: "한계와 미래 전망", with: "\n\n**6. ⚖️ 한계와 미래 전망**\n")
+            hasChanges = true
+        }
+
+        // 변경사항이 있으면 변환된 내용 반환
+        if hasChanges {
+            return formatted
         }
 
         // 일반 모드 응답 포맷팅 - 강력하고 간단한 변환
-        var formatted = message.content
+        var formattedNormal = message.content
+        var hasNormalChanges = false
 
         // 1. "비유를 통한 핵심 요약" 섹션 변환
-        if formatted.contains("비유를 통한 핵심 요약") {
-            // 섹션 앞에 줄바꿈 추가하고 마크다운 헤더로 변환
-            formatted = formatted.replacingOccurrences(of: "비유를 통한 핵심 요약", with: "\n**📌 비유를 통한 핵심 요약**\n")
+        if formattedNormal.contains("비유를 통한 핵심 요약") {
+            formattedNormal = formattedNormal.replacingOccurrences(of: "비유를 통한 핵심 요약", with: "\n**📌 비유를 통한 핵심 요약**\n")
+            hasNormalChanges = true
         }
 
         // 2. "개념의 역사" 섹션 변환
-        if formatted.contains("개념의 역사") {
-            // 섹션 앞에 줄바꿈 추가하고 마크다운 헤더로 변환
-            formatted = formatted.replacingOccurrences(of: "개념의 역사", with: "\n\n**📚 개념의 역사**\n")
+        if formattedNormal.contains("개념의 역사") {
+            formattedNormal = formattedNormal.replacingOccurrences(of: "개념의 역사", with: "\n\n**📚 개념의 역사**\n")
+            hasNormalChanges = true
         }
 
-        // 변환된 내용이 원본과 다르면 변환된 내용 반환
-        if formatted != message.content {
-            return formatted
+        // 변환된 내용이 있으면 반환
+        if hasNormalChanges {
+            return formattedNormal
         }
 
         return message.content
