@@ -99,7 +99,7 @@ Xcode Navigator → EduChat → Build Settings
 
 ---
 
-### 🔧 임시 해결 (현재 적용됨):
+### 🔧 긴급 임시 해결 (현재 적용됨):
 
 #### **MessageBubble.swift 임시 수정:**
 ```swift
@@ -109,10 +109,116 @@ Xcode Navigator → EduChat → Build Settings
 
 #### **MarkdownUI 활성화 방법:**
 ```swift
-// 패키지 확인 후 아래 주석 해제:
+// 패키지 문제 해결 후 아래 주석 해제:
 // import MarkdownUI
 // Markdown(content).markdownTheme(.gitHub)
 ```
+
+---
+
+## 🚨 현재 에러 해결 가이드 (단계별)
+
+### 문제: `'No such module 'MarkdownUI'` 에러
+
+#### **1단계: 패키지 상태 확인**
+```
+Xcode 왼쪽 Navigator → EduChat → Dependencies
+- MarkdownUI가 목록에 있는지 확인
+- 없으면: File → Add Packages... 진행
+```
+
+#### **2단계: 패키지 완전 제거 후 재설치**
+```
+# Xcode에서:
+1. Navigator → Dependencies → MarkdownUI 우클릭 → Delete
+2. File → Add Packages...
+3. URL: https://github.com/gonzalezreal/swift-markdown-ui
+4. Dependency Rule: "Up to Next Major"
+5. Add to Target: EduChat만 체크 ✅
+6. Add Package 클릭
+```
+
+#### **3단계: 캐시 완전 정리**
+```
+# Xcode 닫고 터미널에서 실행:
+rm -rf ~/Library/Developer/Xcode/DerivedData
+rm -rf ~/Library/Caches/com.apple.dt.Xcode
+
+# Xcode 다시 열기
+```
+
+#### **4단계: 클린 빌드**
+```
+Xcode 메뉴:
+Product → Clean Build Folder (⌘+Shift+K)
+```
+
+#### **5단계: 빌드 테스트**
+```
+Product → Build (⌘+B)
+✅ "Build Succeeded" 확인
+```
+
+#### **6단계: MarkdownUI 활성화**
+```swift
+# 성공 시 MessageBubble.swift에서:
+// import MarkdownUI  // 주석 해제
+// Markdown() 컴포넌트 활성화
+```
+
+---
+
+### 🔍 추가 문제 해결:
+
+#### **빌드 설정 확인:**
+```
+Xcode Navigator → EduChat → Build Settings
+- 검색: "Swift Compiler - Search Paths"
+- "Import Paths" 확인
+- "Framework Search Paths" 확인
+```
+
+#### **타겟 멤버십 확인:**
+```
+Xcode Navigator → MessageBubble.swift 선택
+- 우측 Inspector → Target Membership
+- EduChat 체크 ✅ 확인
+```
+
+#### **패키지 캐시 리프레시:**
+```
+Xcode 메뉴:
+File → Packages → Reset Package Caches
+File → Packages → Update to Latest Package Versions
+```
+
+---
+
+### 💡 대안 방법들:
+
+#### **방법 1: 로컬 패키지 복사 (수동)**
+```bash
+# 패키지를 로컬에 다운로드해서 프로젝트에 복사
+cd /Users/test/renew_project/EduChat
+mkdir -p EduChat/EduChat/Services/MarkdownUI
+git clone https://github.com/gonzalezreal/swift-markdown-ui temp_markdown
+cp -r temp_markdown/Sources/MarkdownUI/* EduChat/EduChat/Services/MarkdownUI/
+rm -rf temp_markdown
+```
+
+#### **방법 2: 다른 마크다운 라이브러리**
+```swift
+# SwiftDown 라이브러리 사용 고려
+# https://github.com/tevelee/SwiftDown
+```
+
+---
+
+### 🎯 성공 기준:
+- ✅ **빌드 성공:** "Build Succeeded"
+- ✅ **패키지 표시:** Dependencies에 MarkdownUI 표시
+- ✅ **import 성공:** `import MarkdownUI` 에러 없음
+- ✅ **렌더링 작동:** Markdown 컴포넌트 정상 표시
 
 ---
 
