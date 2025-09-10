@@ -8,7 +8,11 @@ struct MessageBubble: View {
         HStack {
             if message.isFromUser {
                 Spacer()
-                Text(message.content)
+                if #available(macOS 12.0, *) {
+                    Text(.init(message.content))
+                } else {
+                    Text(message.content)
+                }
                     .font(.system(size: 16))
                     .padding(12)
                     .background(Color.blue.opacity(isHovered ? 0.8 : 1.0))
@@ -28,7 +32,11 @@ struct MessageBubble: View {
                         }
                     }
             } else {
-                Text(message.content)
+                if #available(macOS 12.0, *) {
+                    Text(.init(message.content))
+                } else {
+                    Text(message.content)
+                }
                     .padding(14)
                     .background(Color.secondary.opacity(isHovered ? 0.4 : 0.2))
                     .foregroundColor(.primary)
