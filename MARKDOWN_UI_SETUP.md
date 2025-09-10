@@ -229,6 +229,27 @@ rm -rf temp_markdown
 # https://github.com/tevelee/SwiftDown
 ```
 
+#### **방법 3: 직접 폴더 추가 (가장 간단)**
+```bash
+# 1. 라이브러리 다운로드 및 복사 (이미 완료)
+cd /Users/test/renew_project/EduChat
+git clone https://github.com/gonzalezreal/swift-markdown-ui.git temp
+cp -r temp/Sources/MarkdownUI EduChat/EduChat/Services/
+rm -rf temp
+
+# 2. Xcode에서 폴더 추가
+Xcode Navigator → EduChat → Services 우클릭
+"Add Files to EduChat..." 선택
+MarkdownUI 폴더 선택
+"Copy items if needed" 체크 ✅
+"Add to targets: EduChat" 체크 ✅
+"Add" 버튼 클릭
+
+# 3. 빌드 테스트
+Product → Build (⌘+B)
+✅ "Build Succeeded" 확인
+```
+
 ---
 
 ### 🎯 성공 기준:
