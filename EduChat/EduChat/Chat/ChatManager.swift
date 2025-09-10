@@ -30,19 +30,19 @@ final class ChatManager: ObservableObject {
     private let openAIService = OpenAIService()
     private let sessionsKey = "chat_sessions"
 
-    // 마크다운 변환을 위한 함수들
+    // 마크다운 변환을 위한 함수들 - 단락 구분 우선
     private func convertToMarkdown(_ response: String, isStudyMode: Bool) -> String {
         var formatted = response
 
         if isStudyMode {
-            // 딥러닝 모드 마크다운 변환
+            // 딥러닝 모드 마크다운 변환 - 이모지 최소화, 단락 구분 우선
             let deepLearningPatterns = [
-                ("개념의 핵심 본질 파악", "**1. 🧠 개념의 핵심 본질 파악**\n"),
-                ("표면과 관계성 분석", "\n\n**2. 🔍 표면과 관계성 분석**\n"),
-                ("원리와 구현 방법", "\n\n**3. ⚙️ 원리와 구현 방법**\n"),
-                ("응용과 활용 분야", "\n\n**4. 🌐 응용과 활용 분야**\n"),
-                ("역사적 발전과 맥락", "\n\n**5. 📚 역사적 발전과 맥락**\n"),
-                ("한계와 미래 전망", "\n\n**6. ⚖️ 한계와 미래 전망**\n")
+                ("개념의 핵심 본질 파악", "\n\n## 1. 개념의 핵심 본질 파악\n\n"),
+                ("표면과 관계성 분석", "\n\n## 2. 표면과 관계성 분석\n\n"),
+                ("원리와 구현 방법", "\n\n## 3. 원리와 구현 방법\n\n"),
+                ("응용과 활용 분야", "\n\n## 4. 응용과 활용 분야\n\n"),
+                ("역사적 발전과 맥락", "\n\n## 5. 역사적 발전과 맥락\n\n"),
+                ("한계와 미래 전망", "\n\n## 6. 한계와 미래 전망\n\n")
             ]
 
             for (pattern, replacement) in deepLearningPatterns {
@@ -51,10 +51,10 @@ final class ChatManager: ObservableObject {
                 }
             }
         } else {
-            // 일반 모드 마크다운 변환
+            // 일반 모드 마크다운 변환 - 간단하고 명확하게
             let normalPatterns = [
-                ("비유를 통한 핵심 요약", "**📌 비유를 통한 핵심 요약**\n"),
-                ("개념의 역사", "\n\n**📚 개념의 역사**\n")
+                ("비유를 통한 핵심 요약", "\n\n### 비유를 통한 핵심 요약\n\n"),
+                ("개념의 역사", "\n\n### 개념의 역사\n\n")
             ]
 
             for (pattern, replacement) in normalPatterns {
@@ -64,8 +64,8 @@ final class ChatManager: ObservableObject {
             }
         }
 
-        // 추가 포맷팅 정리
-        formatted = formatted.replacingOccurrences(of: "\n\n\n", with: "\n\n")
+        // 추가 포맷팅 정리 - 단락 구분 강화
+        formatted = formatted.replacingOccurrences(of: "\n\n\n\n", with: "\n\n\n")  // 과도한 빈 줄 정리
         formatted = formatted.trimmingCharacters(in: .whitespacesAndNewlines)
 
         return formatted
